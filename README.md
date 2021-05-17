@@ -1,48 +1,70 @@
 # Hello World API: SpringBoot + Kotlin Sample
 
-You can use this sample project to learn how to secure a simple [SpringBoot](https://spring.io/projects/spring-boot) API server using Auth0.
+This sample uses [Spring Security](https://spring.io/projects/spring-security) to implement the following security tasks:
 
-The `starter` branch offers a working API server that exposes three public endpoints. Each endpoint returns a different type of message: public, protected, and admin.
+The `add-authorization` branch offers a working API server that exposes a public endpoint along with two protected endpoints. Each endpoint returns a different type of message: public, protected, and admin.
 
-The goal is to use Auth0 to only allow requests that contain a valid access token in their authorization header to access the protected and admin data. Additionally, only access tokens that contain a `read:admin-messages` permission should access the admin data, which is referred to as [Role-Based Access Control (RBAC)](https://auth0.com/docs/authorization/rbac/).
+The `GET /api/messages/protected` and `GET /api/messages/admin` endpoints are protected against unauthorized access. Any requests that contain a valid access token in their authorization header can access the protected and admin data.
 
-[Check out the `add-authorization` branch]() to see authorization in action using Auth0.
+However, you should require that only access tokens that contain a `read:admin-messages` permission can access the admin data, which is referred to as [Role-Based Access Control (RBAC)](https://auth0.com/docs/authorization/rbac/).
 
 [Check out the `add-rbac` branch]() to see authorization and Role-Based Access Control (RBAC) in action using Auth0.
 
-## Get Started
+## Quick Auth0 Set Up
 
-The only dependency is having `java` installed. You can install like this on OS X:
+The [api](https://auth0.com/docs/api) is provisioned with [Terraform](https://www.terraform.io/) using [Infrastructure as Code](https://infrastructure-as-code.com/).
 
-```bash
-brew install openjdk@11
-```
-
-There's a `go` script that you can use to execute the different tasks.
-
-### Running the application
-
-Use:
+You need to install `terraform` first. I recommend using [tfenv](https://github.com/tfutils/tfenv):
 
 ```bash
-./go run
+brew install tfenv
+(cd terraform && tfenv install)
 ```
 
-### Executing the unit tests
+### Creating an API
 
-Use:
+You have to run the Terraform code to provision an API. The targets are part of the `go` script:
 
 ```bash
-./go test
+./go plan # See the resources that will be created
+./go apply # Provision the API
+./go destroy # Destroy the resources
 ```
 
-### Additional targets
+You need to configure some variables first. The easiest way is to export them in the console before running the targets above:
 
-There are two additional targets, `./go build` and `./go containerize`, in case you want to package the app in a Docker container.
+```bash
+export TF_VAR_audience=targetAudience.auth0.com
+export TF_VAR_auth0_domain=yourTenant.eu.auth0.com
+export TF_VAR_auth0_client_id=client-id-of-the-management-api
+export TF_VAR_auth0_client_secret=secret-of-the-management-api
+```
+
+Then you can run `./go apply` and confirm by writing `yes` when asked.
+
+## Test the Protected Endpoints
+
+There's an [application](https://auth0.com/docs/applications) for testing purposes, called _jwt-validation-test_. You can get an access token from the Auth0 Dashboard to test making a secure call to your protected API endpoints.
+
+Head back to your Auth0 API page and click on the "Test" tab.
+
+Locate the section called "Sending the token to the API".
+
+Click on the cURL tab of the code box.
+
+Copy the sample cURL command:
+
+```bash
+curl --request GET \
+  --url http://localhost:6060/api/messages/protected \
+  --header 'authorization: Bearer really-long-string-which-is-test-your-access-token'
+```
+
+Replace the value of `http://localhost:6060/api/messages/protected` with your protected API endpoint path (you can find all the available API endpoints in the next section) and execute the command. You should receive back a successful response from the server.
+
+You can try out any of our full stack demos to see the client-server Auth0 workflow in action using your preferred front-end and back-end technologies.
 
 ## API Endpoints
-
-The API server defines the following endpoints:
 
 ### 🔓 Get public message
 
@@ -62,9 +84,9 @@ Status: 200 OK
 }
 ```
 
-### 🔓 Get protected message
+> 🔐 Protected Endpoints: These endpoints require the request to include an access token issued by Auth0 in the authorization header.
 
-> You need to protect this endpoint using Auth0.
+### 🔐 Get protected message
 
 ```bash
 GET /api/messages/protected
@@ -82,9 +104,9 @@ Status: 200 OK
 }
 ```
 
-### 🔓 Get admin message
+### 🔐 Get admin message
 
-> You need to protect this endpoint using Auth0 and Role-Based Access Control (RBAC).
+> You need to protect this endpoint using Role-Based Access Control (RBAC).
 
 ```bash
 GET /api/messages/admin
