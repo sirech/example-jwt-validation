@@ -26,4 +26,17 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
                     .value("The API doesn't require an access token to share this message.")
             )
     }
+
+    @Test
+    fun `returns an accepted answer for the protected endpoint`() {
+        mockMvc.perform(
+            get("/api/messages/protected")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        )
+            .andExpect(status().isOk)
+            .andExpect(
+                jsonPath("$.message")
+                    .value("The API successfully validated your access token.")
+            )
+    }
 }
