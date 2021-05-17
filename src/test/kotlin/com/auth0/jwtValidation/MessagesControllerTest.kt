@@ -39,4 +39,17 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
                     .value("The API successfully validated your access token.")
             )
     }
+
+    @Test
+    fun `returns an accepted answer for the admin endpoint`() {
+        mockMvc.perform(
+            get("/api/messages/admin")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        )
+            .andExpect(status().isOk)
+            .andExpect(
+                jsonPath("$.message")
+                    .value("The API successfully recognized you as an admin.")
+            )
+    }
 }

@@ -17,4 +17,9 @@ class MessagesController {
     fun protected(): Message {
         return Message("The API successfully validated your access token.")
     }
+
+    @GetMapping("admin")
+    fun admin(): Message {
+        return Message("The API successfully recognized you as an admin.")
+    }
 }
