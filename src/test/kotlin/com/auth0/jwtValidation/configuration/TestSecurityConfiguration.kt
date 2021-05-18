@@ -3,13 +3,12 @@ package com.auth0.jwtValidation.configuration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Primary
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
-import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import java.nio.charset.StandardCharsets
-import java.time.Duration
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 import kotlin.math.max
@@ -25,7 +24,6 @@ class TestSecurityConfiguration {
         jwtDecoder.setJwtValidator(validator)
         return jwtDecoder
     }
-
     private fun secretKey(): SecretKey {
         val keyBytes: ByteArray = "changeme".toByteArray(StandardCharsets.UTF_8)
         val rawKey = ByteArray(max(keyBytes.size, 32))
