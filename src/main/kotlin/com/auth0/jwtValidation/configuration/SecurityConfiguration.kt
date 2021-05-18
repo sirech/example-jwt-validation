@@ -18,6 +18,13 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/messages/public").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .oauth2ResourceServer()
+                .jwt()
         }
     }
 }
