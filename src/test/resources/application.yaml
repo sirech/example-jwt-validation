@@ -1,0 +1,10 @@
+auth:
+  tenant: yourTenant
+  audience: targetAudience.auth0.com
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://${auth.tenant}.eu.auth0.com/
