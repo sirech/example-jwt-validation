@@ -1,7 +1,8 @@
 package com.auth0.jwtValidation
 
 import com.auth0.jwtValidation.configuration.TestSecurityConfiguration
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
