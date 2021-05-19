@@ -1,6 +1,8 @@
 package com.auth0.jwtValidation
 
 import com.auth0.jwtValidation.configuration.TestSecurityConfiguration
+import org.hamcrest.Matchers
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -32,8 +34,10 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
         )
             .andExpect(status().isOk)
             .andExpect(
-                jsonPath("$.message")
-                    .value("The API doesn't require an access token to share this message.")
+                jsonPath(
+                    "$.message",
+                    `is`("The API doesn't require an access token to share this message.")
+                )
             )
     }
 
@@ -47,8 +51,50 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
         )
             .andExpect(status().isOk)
             .andExpect(
-                jsonPath("$.message")
-                    .value("The API successfully validated your access token.")
+                jsonPath(
+                    "$.message", `is`("The API successfully validated your access token.")
+                )
+            )
+    }
+
+    @Test
+    fun `returns error for the protected endpoint if there is no token`() {
+        val token = "validToken".asStream().readTextAndClose()
+        mockMvc.perform(
+            get("/api/messages/protected")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        )
+            .andExpect(status().isUnauthorized)
+            .andExpect(
+                jsonPath("$.message", `is`("Full authentication is required to access this resource"))
+            )
+    }
+
+    @Test
+    fun `returns error for the protected endpoint if the token is expired`() {
+        val token = "expiredToken".asStream().readTextAndClose()
+        mockMvc.perform(
+            get("/api/messages/protected")
+                .header("Authorization", "Bearer $token")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        )
+            .andExpect(status().isUnauthorized)
+            .andExpect(
+                jsonPath("$.message", containsString("Jwt expired"))
+            )
+    }
+
+    @Test
+    fun `returns error for the protected endpoint if the token has the wrong issuer`() {
+        val token = "wrongIssuerToken".asStream().readTextAndClose()
+        mockMvc.perform(
+            get("/api/messages/protected")
+                .header("Authorization", "Bearer $token")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        )
+            .andExpect(status().isUnauthorized)
+            .andExpect(
+                jsonPath("$.message", containsString("The iss claim is not valid"))
             )
     }
 
@@ -62,8 +108,10 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
         )
             .andExpect(status().isOk)
             .andExpect(
-                jsonPath("$.message")
-                    .value("The API successfully recognized you as an admin.")
+                jsonPath(
+                    "$.message",
+                    `is`("The API successfully recognized you as an admin.")
+                )
             )
     }
 }
