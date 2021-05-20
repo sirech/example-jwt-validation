@@ -20,6 +20,31 @@ goal_test() {
   ./gradlew clean test
 }
 
+_dependencies() {
+  terraform init
+}
+
+goal_plan() {
+  (cd terraform &&
+     _dependencies &&
+     terraform plan
+  )
+}
+
+goal_apply() {
+  (cd terraform &&
+     _dependencies &&
+     terraform apply
+  )
+}
+
+goal_destroy() {
+  (cd terraform &&
+     _dependencies &&
+     terraform destroy
+  )
+}
+
 validate-args() {
   acceptable_args="$(declare -F | sed -n "s/declare -f goal_//p" | tr '\n' ' ')"
 
