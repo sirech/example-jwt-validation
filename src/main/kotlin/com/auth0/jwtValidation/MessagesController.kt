@@ -1,5 +1,6 @@
 package com.auth0.jwtValidation
 
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -19,6 +20,7 @@ class MessagesController {
     }
 
     @GetMapping("admin")
+    @PreAuthorize("hasAuthority('read:admin-messages')")
     fun admin(): Message {
         return Message("The API successfully recognized you as an admin.")
     }

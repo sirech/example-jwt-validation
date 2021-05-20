@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Profile
+import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -15,7 +17,10 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.web.access.AccessDeniedHandler
 import java.io.OutputStream
 import java.time.Duration
 
@@ -45,9 +50,22 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .oauth2ResourceServer { oauth2 ->
                     oauth2
                         .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler())
                         .jwt()
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 }
         }
+    }
+
+    @Bean
+    fun accessDeniedHandler(): AccessDeniedHandler {
+        return AccessDeniedHandler { request, response, accessDeniedException ->
+            response.status = HttpStatus.UNAUTHORIZED.value()
+            val out: OutputStream = response.outputStream
+            ObjectMapper().writeValue(out, Message(accessDeniedException.message ?: ""))
+            out.flush()
+        }
+
     }
 
     @Bean
@@ -84,6 +102,17 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
         return OAuth2TokenValidator { token ->
             validator.validate(token)
+        }
+    }
+
+    private fun jwtAuthenticationConverter(): Converter<Jwt, out AbstractAuthenticationToken> {
+        val converter = JwtGrantedAuthoritiesConverter().also {
+            it.setAuthoritiesClaimName("permissions")
+            it.setAuthorityPrefix("")
+        }
+
+        return JwtAuthenticationConverter().also {
+            it.setJwtGrantedAuthoritiesConverter(converter)
         }
     }
 }

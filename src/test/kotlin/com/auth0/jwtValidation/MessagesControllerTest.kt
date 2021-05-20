@@ -123,6 +123,20 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
     }
 
     @Test
+    fun `returns error for the admin endpoint if the token doesn't have permissions`() {
+        val token = "validToken".asStream().readTextAndClose()
+        mockMvc.perform(
+            get("/api/messages/admin")
+                .header("Authorization", "Bearer $token")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        )
+            .andExpect(status().isUnauthorized)
+            .andExpect(
+                jsonPath("$.message", containsString("Access is denied"))
+            )
+    }
+
+    @Test
     fun `returns an accepted answer for the admin endpoint`() {
         val token = "validWithPermissionsToken".asStream().readTextAndClose()
         mockMvc.perform(
