@@ -23,6 +23,7 @@ import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
 import java.io.OutputStream
 import java.time.Duration
+import javax.servlet.http.HttpServletResponse
 
 
 @EnableWebSecurity
@@ -60,10 +61,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Bean
     fun accessDeniedHandler(): AccessDeniedHandler {
         return AccessDeniedHandler { request, response, accessDeniedException ->
-            response.status = HttpStatus.UNAUTHORIZED.value()
-            val out: OutputStream = response.outputStream
-            ObjectMapper().writeValue(out, Message(accessDeniedException.message ?: ""))
-            out.flush()
+            formatError(response, accessDeniedException)
         }
 
     }
@@ -71,11 +69,17 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Bean
     fun authenticationEntryPoint(): AuthenticationEntryPoint {
         return AuthenticationEntryPoint { _, response, authException ->
-            response.status = HttpStatus.UNAUTHORIZED.value()
-            val out: OutputStream = response.outputStream
-            ObjectMapper().writeValue(out, Message(authException.message ?: ""))
-            out.flush()
+            formatError(response, authException)
         }
+    }
+
+    private fun formatError(
+        response: HttpServletResponse, accessDeniedException: RuntimeException
+    ) {
+        response.status = HttpStatus.UNAUTHORIZED.value()
+        val out: OutputStream = response.outputStream
+        ObjectMapper().writeValue(out, Message(accessDeniedException.message ?: ""))
+        out.flush()
     }
 
     @Profile("!test")
