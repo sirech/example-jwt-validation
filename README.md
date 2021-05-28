@@ -72,6 +72,15 @@ export TF_VAR_auth0_client_secret=secret-of-the-management-api
 
 Then you can run `./go apply` and confirm by writing `yes` when asked.
 
+### Connect with Auth0
+
+To ensure that the application can authenticate properly with _Auth0_ when running `./go run`, you need to define two variables:
+
+```bash
+export AUTH_TENANT=yourTenant # Align it with TF_VAR_auth0_domain
+export AUTH_AUDIENCE=targetAudience.auth0.com # Align it with TF_VAR_audience
+```
+
 ## Test the Protected Endpoints
 
 There's an [application](https://auth0.com/docs/applications) for testing purposes, called _jwt-validation-test_. You can get an access token from the Auth0 Dashboard to test making a secure call to your protected API endpoints.
