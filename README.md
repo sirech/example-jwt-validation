@@ -10,6 +10,36 @@ However, you should require that only access tokens that contain a `read:admin-m
 
 [Check out the `add-rbac` branch]() to see authorization and Role-Based Access Control (RBAC) in action using Auth0.
 
+## Get Started
+
+The only dependency is having `java` installed. You can install like this on OS X:
+
+```bash
+brew install openjdk@11
+```
+
+There's a `go` script that you can use to execute the different tasks.
+
+### Running the application
+
+Use:
+
+```bash
+./go run
+```
+
+### Executing the unit tests
+
+Use:
+
+```bash
+./go test
+```
+
+### Additional targets
+
+There are two additional targets, `./go build` and `./go containerize`, in case you want to package the app in a Docker container.
+
 ## Quick Auth0 Set Up
 
 The [api](https://auth0.com/docs/api) is provisioned with [Terraform](https://www.terraform.io/) using [Infrastructure as Code](https://infrastructure-as-code.com/).
