@@ -2,12 +2,12 @@ server:
   port: 6060
 
 auth:
-  tenant: yourTenant
-  audience: targetAudience.auth0.com
+  domain: YOUR-AUTH0-DOMAIN
+  audience: https://hello-world.example.com
 
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://${auth.tenant}.eu.auth0.com/
+          issuer-uri: https://${auth.domain}/

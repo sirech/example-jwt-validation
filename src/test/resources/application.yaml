@@ -1,5 +1,5 @@
 auth:
-  tenant: yourTenant
+  domain: yourTenant.eu.auth0.com
   audience: targetAudience.auth0.com
 
 spring:
@@ -7,4 +7,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://${auth.tenant}.eu.auth0.com/
+          issuer-uri: https://${auth.domain}/
