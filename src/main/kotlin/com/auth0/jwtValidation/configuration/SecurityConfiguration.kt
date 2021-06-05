@@ -40,7 +40,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/messages/public").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/api/messages/*").authenticated()
                 .and()
                 .oauth2ResourceServer { oauth2 ->
                     oauth2

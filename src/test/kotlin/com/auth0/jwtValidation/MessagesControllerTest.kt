@@ -28,6 +28,15 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
         .build()
 
     @Test
+    fun `returns a 404 por routes that don't exist`() {
+        mockMvc.perform(
+            get("/api/test")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        )
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
     fun `returns an accepted answer for the public endpoint`() {
         mockMvc.perform(
             get("/api/messages/public")
@@ -128,4 +137,5 @@ internal class MessagesControllerTest(@Autowired val webApplicationContext: WebA
                 )
             )
     }
+
 }
